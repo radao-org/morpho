@@ -3,13 +3,21 @@ const ethers = require('hardhat').ethers
 
 async function main() {
   const [deployer, owner] = await ethers.getSigners()
-  const fixedIrm = await hre.ethers.deployContract('FixedIrm', ['80000000000000000'], deployer)
-  await fixedIrm.waitForDeployment()
-  const fixedOracle = await hre.ethers.deployContract('FixedOracle', [owner.address], deployer)
-  await fixedOracle.waitForDeployment()
+
+  const ppsOracle = await hre.ethers.deployContract('PPSOracle', [owner.address], deployer)
+  await ppsOracle.waitForDeployment()
+
+  // 1 COLLATERAL = 42 LOAN
+  const collateralDecimals = 6
+  const loanDecimals = 18
+  const price = ethers.parseUnits('42', 36 + loanDecimals - collateralDecimals)
+  await (await ppsOracle.connect(owner).setPrice(price)).wait()
+
   console.log({
-    fixedIrm: fixedIrm.target,
-    fixedOracle: fixedOracle.target
+    ppsOracle: {
+      address: ppsOracle.target,
+      price: await ppsOracle.price()
+    }
   })
 }
 
