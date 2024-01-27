@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../morpho-blue/src/interfaces/IOracle.sol";
 
 contract PPSOracle is Ownable, IOracle {
+    event SetPrice(uint256 oldPrice, uint256 newPrice);
+
     uint256 public _price;
 
     constructor(address owner) Ownable(owner) {}
@@ -13,6 +15,7 @@ contract PPSOracle is Ownable, IOracle {
     /// @param newPrice The new price, scaled by WAD.
     /// @dev Set the price to 0 to make the oracle revert on `price`.
     function setPrice(uint256 newPrice) public onlyOwner {
+        emit SetPrice(_price, newPrice);
         _price = newPrice;
     }
 

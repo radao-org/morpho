@@ -32,9 +32,10 @@ describe('PPSOracle', function () {
   describe('Set price', function () {
     it('Should set a new price (owner)', async function () {
       const {owner, ppsOracle} = await loadFixture(initFixture)
-      const price = 24
-      await ppsOracle.connect(owner).setPrice(price)
-      expect(await ppsOracle.price()).to.equal(price)
+      const newPrice = 24
+      await expect(await ppsOracle.connect(owner).setPrice(newPrice))
+        .emit(ppsOracle, "SetPrice").withArgs(PRICE, newPrice)
+      expect(await ppsOracle.price()).to.equal(newPrice)
     })
 
     it(`Should don't set a new price (not owner)`, async function () {
